@@ -46,6 +46,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        // returns simple json objects when an exception is thrown 
         if($exception instanceof \Illuminate\Auth\AuthenticationException){
             return response()->json(['message' => 'unauthorized'], 401);
         }
@@ -56,6 +57,7 @@ class Handler extends ExceptionHandler
         if($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException){
             return response()->json(['message' => 'model not found'], 404);
         }
-        return parent::render($request, $exception);
+        return response()->json(['message' => 'something bad happened', 'errors' => $exception->getMessage()], 500);
+        //return parent::render($request, $exception);
     }
 }

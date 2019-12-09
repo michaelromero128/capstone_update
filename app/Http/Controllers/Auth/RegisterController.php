@@ -79,7 +79,7 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         
-        
+        // validates parameters
         $this->validator($request->all())->validate();
         
        if(\config('authController.status') == 'production' &&   substr($request->email,-7,7) != 'mdc.edu'){
