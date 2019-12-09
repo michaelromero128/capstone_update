@@ -177,7 +177,7 @@ class EventControllerTest extends TestCase
             $response->assertStatus(404);
             
             // test variants of a get
-            $response = $this->get('api/events?zipcode=33187&range=10000&q=test&date=2020-10-10');
+            $response = $this->get('api/events?zipcode=33187&q=Velit%20beatae%20unde&range=10000&date=2020-10-10');
             $response->assertOk();
             $response->assertJsonStructure([
                 'data'

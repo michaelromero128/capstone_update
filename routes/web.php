@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 //});
 
 Auth::routes(['verify' => true]);
-Route::post('email/customVerify', 'Auth\VerificationController@customVerify')->middleware('throttle:60,1')->name('email.customVerify');
-Route::post('email/customResend', 'Auth\VerificationController@customResend')->middleware('throttle:60,1')->name('email.customResend');
-Route::post('password/change', 'Auth\ChangePasswordController@changePassword')->middleware('auth:api','throttle:60,1')->name('password.change');
+Route::post('email/customVerify', 'Auth\VerificationController@customVerify')->middleware('throttle:6,1')->name('email.customVerify');
+Route::post('email/customResend', 'Auth\VerificationController@customResend')->middleware('throttle:6,1')->name('email.customResend');
+Route::post('password/change', 'Auth\ChangePasswordController@changePassword')->middleware('auth:api','throttle:6,1')->name('password.change');
 //Route::get('/home', 'HomeController@index')->name('home')->middleware('verified');

@@ -28,10 +28,9 @@ class UserControllerTest extends TestCase
 {
         use DatabaseTransactions;
 
-        
-        
-        
-        public function testCreateEvent(){
+        public function testUserChange(){
+            
+            
             $this->withoutMiddleware();
             $user= $this->createVerifiedUser();
             $file = UploadedFile::fake()->image('random.jpg');
@@ -39,228 +38,47 @@ class UserControllerTest extends TestCase
             Storage::fake('public');
             $params = $this->createEventParams();
             $response = $this->call('POST', route('event.store'), $params, [], ['file' => [$file]]);
-            $response->assertOk()->assertJson([
-                'event_title' => 'test',
-                'event_details' => 'test',
-                'host_organization' => 'test',
-                'event_coordinator_name' => 'test',
-                'event_coordinator_phone' => 'test',
-                'event_coordinator_email' => 'test@test.test',
-                'start_date' => '2020-10-10',
-                'end_date' => '2020-10-11',
-                'start_time' => 'test',
-                'end_time' => 'test',
-                'requirements_major' => 'test',
-                'age_requirement' => 18,
-                'minimum_hours' => 2,
-                'tags' => 'test',
-                'category' => 'test',
-                'featured' => 0,
-                'shifts' => 'test',
-                'city' => 'test',
-                'address' => 'test',
-                'zipcode' => '210',
-                'lat' => 43.00590,
-                'lon' => -71.01320,
-                'user_id' => $user->id,
-            ]);
-            $this->assertEquals('docs/' . $file->hashName(), EventPhoto::latest()->first()->filename);
-            Storage::disk('public')->assertExists('docs/' .$file->hashName());
-        }
-        public function testCreateBadEvent(){
-            $this->withoutMiddleware();
-            $user= $this->createVerifiedUser();
-            $file = UploadedFile::fake()->image('random.jpg');
+            $userAdmin= User::where('rank', 'root')->first();
+            
+            $this->be($userAdmin);
+            $response = $this->call('POST', route('user.change_rank'), ['user_id' => $user->id, 'change' => 'elevate'], [], []);
+            $response->assertOk();
+            $user->refresh();
+            $this->assertEquals('elevated',$user->rank);
+            $response = $this->call('POST', route('user.change_rank'), ['user_id' => $user->id, 'change' => 'demote'], [], []);
+            $response->assertOk();
+            $user->refresh();
+            $this->assertEquals('reg',$user->rank);
             $this->be($user);
-            Storage::fake('public');
-            $params = $this->createBadEventParams();
-            $response = $this->call('POST', route('event.store'), $params, [], ['file' => [$file]]);
-            $response->assertStatus(422);
+            $response = $this->call('POST', route('user.change_rank'), ['user_id' => $userAdmin->id, 'change' => 'demote'], [], []);
+            $response->assertStatus(401);
         }
-        public function testGetOneEvent(){
+        
+        public function testUserGet(){
+            
             $this->withoutMiddleware();
             $user= $this->createVerifiedUser();
             $file = UploadedFile::fake()->image('random.jpg');
             $this->be($user);
             Storage::fake('public');
             $params = $this->createEventParams();
-            $response = $this->call('POST', route('event.store'), $params, [], ['file' => [$file]]);
-            $id =$response->json('id');
-            $response = $this->get('api/events/' . $id);
+            $this->call('POST', route('event.store'), $params, [], ['file' => [$file]]);
+            $response = $this->call('GET', 'api/user/profile/' . $user->id, [], [], []);
             $response->assertOk();
             $response->assertJson([
-                'event_title' => 'test',
-                'event_details' => 'test',
-                'host_organization' => 'test',
-                'event_coordinator_name' => 'test',
-                'event_coordinator_phone' => 'test',
-                'event_coordinator_email' => 'test@test.test',
-                'start_date' => '2020-10-10',
-                'end_date' => '2020-10-11',
-                'start_time' => 'test',
-                'end_time' => 'test',
-                'requirements_major' => 'test',
-                'requirements_year' => 'test',
-                'requirement_one' => 'test',
-                'requirement_two' => 'test',
-                'requirement_three' => 'test',
-                'age_requirement' => 18,
-                'minimum_hours' => 2,
-                'featured' => 0,
-                'tags' => 'test',
-                'category' => 'test',
-                'shifts' => 'test',
-                'city' => 'test',
-                'address' => 'test',
-                'zipcode' => '210',
-            ]);
-            $response = $this->get('api/events/' . -33);
-            $response->assertStatus(404);
-        }
-        public function testGetEvents(){
-            $this->withoutMiddleware();
-            $user= $this->createVerifiedUser();
-            $file = UploadedFile::fake()->image('random.jpg');
-            $this->be($user);
-            Storage::fake('public');
-            $params = $this->createEventParams();
-            $response = $this->call('POST', route('event.store'), $params, [], ['file' => [$file]]);
-            $response = $this->get('api/events');
-            $response->assertOk();
-            $response->assertJsonStructure([
-                'data'
-            ]);
-            $response->assertJsonStructure([
-                'data' => [
-                    '*' =>[
-                        'event_title',
-                        'event_details'  ,
-                        'host_organization',
-                        'event_coordinator_name',
-                        'event_coordinator_phone',
-                        'event_coordinator_email',
-                        'start_date',
-                        'end_date',
-                        'start_time',
-                        'end_time',
-                        'requirements_major',
-                        'age_requirement',
-                        'minimum_hours',
-                        'tags',
-                        'featured',
-                        'category',
-                        'shifts',
-                        'city',
-                        'address',
-                        'zipcode',
-                        'event_photos'
-                        
-                    ],
-                    '*' =>[
-                        'event_title',
-                        'event_details'  ,
-                        'host_organization',
-                        'event_coordinator_name',
-                        'event_coordinator_phone',
-                        'event_coordinator_email',
-                        'start_date',
-                        'end_date',
-                        'start_time',
-                        'end_time',
-                        'requirements_major',
-                        'requirements_year',
-                        'requirement_one',
-                        'requirement_two',
-                        'requirement_three',
-                        'age_requirement',
-                        'minimum_hours',
-                        'tags',
-                        'featured',
-                        'category',
-                        'shifts',
-                        'city',
-                        'address',
-                        'zipcode',
-                    ]
-                ]
-            ]);
+                'id' => $user->id,
+                'title' => $user->title,
+                'name' => $user->name,
+                'location' => $user->location,
+                'phone' => $user->phone,
+                'email' => $user->email,
+                'rank' => $user->rank ]);
             
-            $response = $this->get('api/events/' . -33);
-            $response->assertStatus(404);
-            
-            // test every variant of a get with different param combinations to test each return
-            $response = $this->get('api/events?zipcode=33187&range=10000&q=test&date=2020-10-10');
-            $response->assertOk();
-            $response->assertJsonStructure([
-                'data'
-            ]);
-            $response = $this->get('api/events?zipcode=33187&range=10000&q=test&old=yes');
-            $response->assertOk();
-            $response->assertJsonStructure([
-                'data'
-            ]);
-            $response = $this->get('api/events?zipcode=33187&range=10000');
-            $response->assertOk();
-            $response->assertJsonStructure([
-                'data'
-            ]);
-            $response = $this->get('api/events?q=test&date=2020-10-10');
-            $response->assertOk();
-            $response->assertJsonStructure([
-                'data'
-            ]);
-            $response = $this->get('api/events?q=test&old=yes');
-            $response->assertOk();
-            $response->assertJsonStructure([
-                'data'
-            ]);
-            $response = $this->get('api/events?date=2020-10-10');
-            $response->assertOk();
-            $response->assertJsonStructure([
-                'data'
-            ]);
-            $response = $this->get('api/events?old=yes');
-            $response->assertOk();
-            $response->assertJsonStructure([
-                'data'
-            ]);
         }
         
-        public function testPutEvent(){
-            $this->withoutMiddleware();
-            $user= $this->createVerifiedUser();
-            $file = UploadedFile::fake()->image('random.jpg');
-            $this->be($user);
-            Storage::fake('public');
-            $params = $this->createEventParams();
-            $response = $this->call('POST', route('event.store'), $params, [], ['file' => [$file]]);
-            $id =$response->json('id');
-            $params= ['event_title' => 'thing'];
-            $response = $this->call('PUT', 'api/events/' . $id, $params, [],[]);
-            $response->assertOk();
-            $response->assertJson([
-                'event_title' => 'thing',
-            ]);
-            $response = $this->call('PUT', 'api/events/' . -33, $params, [],[]);
-            $response->assertStatus(404);
-        }
-        public function testDeleteEvent(){
-            $this->withoutMiddleware();
-            $user= $this->createVerifiedUser();
-            $file = UploadedFile::fake()->image('random.jpg');
-            $this->be($user);
-            Storage::fake('public');
-            $params = $this->createEventParams();
-            $response = $this->call('POST', route('event.store'), $params, [], ['file' => [$file]]);
-            $id =$response->json('id');
-            $params= ['event_title' => 'thing'];
-            $response = $this->call('DELETE', 'api/events/' . $id, [], [],[]);
-            $response->assertOk();
-            $response = $this->call('GET', 'api/events/' . $id, [], [],[]);
-            $response->assertStatus(404);
-            $response = $this->call('DELETE', 'api/events/' . $id, [], [],[]);
-            $response->assertStatus(404);
-        }
+        
+        
+       
         private function createTestUserParams(){
             $params = [
                 'title' => 'test',

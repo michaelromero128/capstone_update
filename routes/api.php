@@ -21,8 +21,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::namespace('Api')->group(function () {
-    Route::post('/password-grant-auth','AuthController@grant' )->middleware('throttle:60,1')->name('auth_grant');
-    Route::post('/refresh','AuthController@refresh' )->middleware('throttle:60,1')->name('auth_refresh');
+    Route::post('/password-grant-auth','AuthController@grant' )->middleware('throttle:6,1')->name('auth_grant');
+    Route::post('/refresh','AuthController@refresh' )->middleware('throttle:6,1')->name('auth_refresh');
     
     Route::get('/events','EventController@index')->name('event.index');
     Route::post('/events', 'EventController@store')->name('event.store')->middleware('auth:api');

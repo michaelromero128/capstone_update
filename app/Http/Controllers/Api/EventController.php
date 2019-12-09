@@ -52,9 +52,7 @@ class EventController extends Controller
         return $query->where('end_date','>=',date('Y-m-d'))->orderBy($orderBy)->simplePaginate($request->input('pagen',8));
     }
 
-    //public function searchTerms($request){
-    // return Event::search($terms)->get();
-    //}
+    
 
     /**
      * Store a newly created resource in storage.

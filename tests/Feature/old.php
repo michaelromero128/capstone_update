@@ -27,7 +27,7 @@ use App\Notifications\CustomResetPasswordNotification;
 
 
 
-class FeatureTest extends TestCase
+class old extends TestCase
 {
     
     /**

@@ -47,6 +47,56 @@ class AuthControllerTest extends TestCase
         // 401 because the route will throw a authorization exception if anything but a 200 is returned by the guzzle client
         \Mockery::close();
     }
+    public function testGeRefreshToken(){
+        $user =$this->createVerifiedUser();
+        $params = [
+            'email' =>$user->email,
+            'password' =>'testtest',
+        ];
+        $out = new Response(200);//
+        
+        $client = Mockery::mock(Client::class);
+        $client->makePartial()->shouldReceive('request')->once()->andReturn($out);
+        $this->app->instance(Client::class, $client);
+        $response = $this->post(route('auth_grant'), $params);
+        $response->assertOk();
+        
+        
+        $out = new Response(200);//
+        $client = Mockery::mock(Client::class);
+        $client->makePartial()->shouldReceive('request')->once()->andReturn($out);
+        $this->app->instance(Client::class, $client);
+        $response = $this->post(route('auth_refresh'), $params);
+        $response->assertOk();
+        \Mockery::close();
+    }
+    
+    public function testGeBadRefreshToken(){
+        $user =$this->createVerifiedUser();
+        $params = [
+            'email' =>$user->email,
+            'password' =>'testtest',
+        ];
+        $out = new Response(200);//
+        
+        $client = Mockery::mock(Client::class);
+        $client->makePartial()->shouldReceive('request')->once()->andReturn($out);
+        $this->app->instance(Client::class, $client);
+        $response = $this->post(route('auth_grant'), $params);
+        $response->assertOk();
+        
+        
+        $out = new Response(400);//
+        $client = Mockery::mock(Client::class);
+        $client->makePartial()->shouldReceive('request')->once()->andReturn($out);
+        $this->app->instance(Client::class, $client);
+        $response = $this->post(route('auth_refresh'), $params);
+        $response->assertStatus(401);
+        \Mockery::close();
+    }
+    
+    
+    
     
     private function createTestUserParams(){
         $params = [
@@ -60,6 +110,7 @@ class AuthControllerTest extends TestCase
         ];
         return $params;
     }
+    
     
     private function createVerifiedUser(){
         $this->createTestUserParams();
