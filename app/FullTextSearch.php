@@ -4,12 +4,8 @@ namespace App;
 
 trait FullTextSearch
 {
-    /**
-     * Replaces spaces with full text search wildcards
-     *
-     * @param string $term
-     * @return string
-     */
+    
+    //conversion of the input search term
     protected function fullTextWildcards($term)
     {
         // removing symbols used by MySQL
@@ -33,13 +29,8 @@ trait FullTextSearch
         return $searchTerm;
     }
 
-    /**
-     * Scope a query that matches a full text search of term.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $term
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
+    // raw sql query for full text search
+    
     public function scopeSearch($query, $term)
     {
         $columns = implode(',', $this->searchable);

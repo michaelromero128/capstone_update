@@ -13,6 +13,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use Notifiable;
     use HasApiTokens;
 
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -40,14 +41,17 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
     
+    // asserts foreign key relationship
     public function verifyUser(){
         return $this->hasOne('App\VerifyUser');
     }
     
+    // sets custom notification for password resets
     public function sendPasswordResetNotification($token){
         $this->notify(new CustomResetPasswordNotification($token));
     }
     
+    // asserts foreign key relationship
     public function events(){
         return $this->hasMany('App\Event');
     }

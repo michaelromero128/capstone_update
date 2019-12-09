@@ -44,7 +44,7 @@ class ResetPasswordController extends Controller
             }
         );
         
-        
+        // unchanged besides custom error message
         return $response == Password::PASSWORD_RESET
         ? response()->json(['message' => 'Everything Worked out'],200)
         

@@ -38,20 +38,24 @@ class ChangePasswordController extends Controller
     
     public function changePassword(Request $request)
     {
+        // validates request
         $request->validate(['email' => 'required|email', 'current_password' => 'required | string', 'new_password' => ' confirmed |required | string | between:8,255']);
-        
+        // finds user
         $user= User::where('email',$request->email)->first();
         if($user == null){
             throw new ModelNotFoundException();
         }
+        //checks password
         if (!(Hash::check($request->get('current_password'), $user->password))) {
             // The passwords don't matches
             return response()->json(['message' => 'invalid password'],401);;
         }
+        //sees if new password is different
         if(strcmp($request->get('current_password'), $request->get('new_password')) == 0){
             //Current password and new password are same
             return response()->json(['message' => 'same as old password'],400);
         }
+        // changes password
         if($user->password = Hash::make($request->get('new_password'))){
             $user->setRememberToken(Str::random(60));
             

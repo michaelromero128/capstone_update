@@ -24,6 +24,7 @@ class ForgotPasswordController extends Controller
     
     public function sendResetLinkEmail(Request $request)
     {
+        // this is unchanged from the vendor version, just wanted custom error messages
         $this->validateEmail($request);
         
         // We will send the password reset link to this user. Once we have attempted

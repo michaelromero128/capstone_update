@@ -81,11 +81,11 @@ class RegisterController extends Controller
         
         // validates parameters
         $this->validator($request->all())->validate();
-        
+        // checks email domain restrictions
        if(\config('authController.status') == 'production' &&   substr($request->email,-7,7) != 'mdc.edu'){
            return response()->json(['message' => 'not a valid mdc.edu email'], 400);
        }
-       
+       // sanitizes input
        $params = [
            'title' => htmlentities($request->input('title','')),
            'name' => htmlentities($request->input('name','')),
@@ -96,12 +96,14 @@ class RegisterController extends Controller
            'password' => Hash::make($request->input('password')),
            
        ];
+       // creates a user and related verifuser objects
         $user = User::create($params);
         VerifyUser::create([
             'user_id' => $user->id,
             'token' => substr(sha1(time()),0,7)
         ]);
         //Mail::queue(new Verify($user))->to($user->email);
+        // sends verification email
          Mail::to($user->email)->queue(new Verify($user));
         
         

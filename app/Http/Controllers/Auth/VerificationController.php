@@ -48,8 +48,9 @@ class VerificationController extends Controller
     }
     
     
-    
+    // verifies user
     public function customVerify(Request $request){
+        //validates input
         if(!isset($request->user_id)){
             return response()->json(['message' => 'No user ID'],400);
         }
@@ -61,11 +62,14 @@ class VerificationController extends Controller
         if($user == null){
             return response()->json(['message' => 'Bad User Id'],400);
         }
+        // gets the related user
+        // checks if email is allready validated
         if ($user->hasVerifiedEmail()) {
             return response()->json(['message' => 'Already verified'],400);
         }
-        
+        //checks token
         if($request->token == $user->verifyUser->token){
+            //marks user as verified
             if($user->markEmailAsVerified()){
                 event(new Verified($user));
                 VerifyUser::where('user_id',$user->verifyUser->user_id)->first()->delete();
@@ -79,16 +83,18 @@ class VerificationController extends Controller
             
         }
     }
+    // resends email for verification
     public function customResend(Request $request)
     {
         $user = User::where('email', $request->email)->first();
         if($user == null){
             throw new ModelNotFoundException();
         }
+        // checks if email is all ready verified
         if ($user->hasVerifiedEmail()) {
             return response()->json(['message' => 'Already registered'], 400);
         }
-        
+        // resends email 
         Mail::to($user->email)->queue(new Resend($user));
         
         return response()->json(['message' => 'Email Resent'], 200);

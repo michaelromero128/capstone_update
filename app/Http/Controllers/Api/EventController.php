@@ -27,7 +27,7 @@ class EventController extends Controller
     {
         $orderBy = $request->input('orderBy','start_date');
         $query = Event::with('eventPhotos');
-        
+        // builds query depending on parameters of request
         if(isset($request->zipcode)){
            $query = $query->zipcode($request->input('range',25), $request->zipcode);
         }
@@ -40,6 +40,8 @@ class EventController extends Controller
         if(isset($request->user)){
             $query = $query->where('user_id',$request->user);
         }
+        
+        // returns a specific type of output based upon parameters
         if(isset($request->date)){
             return $query->daterange($request->date)->with('eventPhotos')->orderBy($orderBy)->simplePaginate($request->input('pagen',8));
         }
@@ -62,9 +64,10 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-       
+       // uses a transaction in case file upload fails
         DB::beginTransaction();
         try{
+            // validates request
             $request->validate([
         
                 'event_title' => 'required |string',
@@ -88,6 +91,7 @@ class EventController extends Controller
                 'zipcode' => 'numeric | required',
                 
                 ]);
+            // puts all input through htmlentities filter
             $params = [
                 'event_title' => htmlentities($request->input('event_title')),
                 'event_details' => htmlentities($request->input('event_details')),
@@ -110,10 +114,13 @@ class EventController extends Controller
                 'address'  => htmlentities($request->input('address')),
                 'zipcode' => htmlentities(substr($request->input('zipcode'),0,5)),
             ];
+            // creates event
             $event = Event::create($params);
             
+            
+            //creates event photos
             if($request->hasFile('file')){
-                request()->validate(['file' =>'required', 'file.*' => 'mimes:jpeg,jpg,png,gif']);
+                request()->validate(['file' =>'required |image']);
                 
                 $files = $request->file;
                 
@@ -127,13 +134,15 @@ class EventController extends Controller
         }catch(\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             
-            
+            // rolls back if there is an exception
             throw new ValidationException($e->errors());
         }
         
         DB::commit();
+        // associates the event with a user
         $event= Event::where('id',$event->id)->with('eventPhotos')->first();
         Auth::user()->events()->save($event);
+        // returns the event
         return $event->refresh();
         
     }
@@ -158,14 +167,14 @@ class EventController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+        // finds the event
         $event = Event::findOrFail($id);
-        
+        //check if user is authorized to view
         $user= Auth::user();
         if($event->user->id != $user->id && ($user->rank != 'elevated' && $user->rank != 'root')){
             throw  new AuthorizationException('Unauthorized user');
         }
-        
+        // validate request
         $request->validate([
             'event_title' => 'string ',
             'event_details' => 'string ',
@@ -186,6 +195,7 @@ class EventController extends Controller
             'address' => 'string',
             'zipcode' => 'numeric',
         ]);
+        // update event
         $event->update($request->only([
             'event_title',
             'event_details',
@@ -218,9 +228,11 @@ class EventController extends Controller
      */
     public function destroy($id)
     {
+        //finds event and user
         $event = Event::findOrFail($id);
         $user= Auth::user();
         
+        // destroys event
         if($event->user->id != $user->id && $user->rank != 'elevated' && $user->rank != 'root'){
             throw  new AuthorizationException('Unauthorized user');
         }
