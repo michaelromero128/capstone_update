@@ -12,7 +12,7 @@ class EventsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Event::class, 60)->create()->each(function($event){
+        factory(Event::class, 120)->create()->each(function($event){
             $event->eventPhotos()->save(factory(App\EventPhoto::class,1)->create()->first());
             $event->eventPhotos()->save(factory(App\EventPhoto::class,1)->create()->first());
         });

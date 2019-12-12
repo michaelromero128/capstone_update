@@ -22,7 +22,7 @@ class EventPhotoController extends Controller
         if($event->user_id != $user->id && ($user->rank != 'elevated' || $user->rank != 'root')){
             throw  new Illuminate\Auth\Access\AuthorizationException('Unauthorized user');
         }
-        $this->validate($request, ['file' =>'required', 'file.*' => 'mimes:jpeg,jpg,png,gif']);
+        $this->validate($request, ['file' =>'required', 'file.*' => 'mimes:jpeg,jpg,png,gif,svg']);
         // creates a new event photo for each file
         foreach($request->file('file') as $file){
             

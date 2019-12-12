@@ -22,8 +22,8 @@ class CreateEventsTable extends Migration
             $table->string('event_coordinator_name');
             $table->string('event_coordinator_phone');
             $table->string('event_coordinator_email');
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->date('start_date')->index();
+            $table->date('end_date')->index();
             $table->string('start_time');
             $table->string('end_time');
             $table->string('requirements_major',255);
@@ -38,7 +38,7 @@ class CreateEventsTable extends Migration
             $table->integer('zipcode');
             $table->decimal('lat',8,5);
             $table->decimal('lon',8,5);
-            $table->bigInteger('user_id')->unsigned()->nullable(true);
+            $table->bigInteger('user_id')->unsigned()->nullable(true)->index();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
             $table->softDeletes();

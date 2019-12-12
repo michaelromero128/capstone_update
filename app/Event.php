@@ -34,7 +34,6 @@ class Event extends Model
         'city',
         'address',
         'zipcode',
-        'file'
     ];
     //attributes that will be used for the full text search, must be indexed in table creation
     protected $searchable = [
@@ -68,8 +67,8 @@ class Event extends Model
         return $query
         ->select('*')
         ->selectRaw($haversine)
-        ->havingRaw("distance < ?", [$range])
-        ->orderBy("distance","asc");
+        ->havingRaw("distance < ?", [$range]);
+        //->orderBy("distance","asc");
     }
     //shortcut for this query string
     public function scopeDaterange($query,$date){

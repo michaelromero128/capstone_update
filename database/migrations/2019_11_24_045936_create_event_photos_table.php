@@ -17,7 +17,7 @@ class CreateEventPhotosTable extends Migration
             $table->bigIncrements('id');
             $table->string('filename');
             $table->timestamps();
-            $table->bigInteger('event_id')->unsigned()->nullable(true);
+            $table->bigInteger('event_id')->unsigned()->nullable(true)->index();
             $table->foreign('event_id')->references('id')->on('events');
         });
     }

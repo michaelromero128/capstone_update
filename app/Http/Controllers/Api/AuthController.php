@@ -47,7 +47,10 @@ class AuthController extends Controller
         if($response->getStatusCode()!= 200){
             throw new AuthenticationException();
         }
-        return json_decode((string) $response->getBody(), true);
+        $array = json_decode((string) $response->getBody(), true);
+        $array['id'] = $user->id;
+        $array['rank']=$user->rank;
+        return $array;
         
         }
         public function refresh(Request $request){

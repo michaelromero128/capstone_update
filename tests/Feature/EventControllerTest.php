@@ -6,11 +6,12 @@ namespace Tests\Feature;
  use Illuminate\Auth\Events\Registered;
  use Illuminate\Auth\Events\Verified;
  use Tests\TestCase;
+use App\Event;
  use App\EventPhoto;
  use App\User;
  use Illuminate\Foundation\Testing\DatabaseTransactions;
  use Illuminate\Support\Facades\DB;
- use Illuminate\Support\Facades\Event;
+
  use Illuminate\Support\Facades\Hash;
  use Illuminate\Support\Facades\Mail;
  use Illuminate\Support\Facades\Notification;
@@ -22,7 +23,7 @@ namespace Tests\Feature;
  use \Mockery;
  use Illuminate\Foundation\Testing\WithoutMiddleware;
  use Illuminate\Http\UploadedFile;
- use App\Notifications\CustomResetPasswordNotification;
+use App\Notifications\CustomResetPasswordNotification;
 class EventControllerTest extends TestCase
 {
         use DatabaseTransactions;
@@ -35,7 +36,8 @@ class EventControllerTest extends TestCase
             Storage::fake('public');
             $params = $this->createEventParams();
             $response = $this->call('POST', route('event.store'), $params, [], ['file' => [$file]]);
-            $response->assertOk()->assertJson([
+            $response->assertOk();
+            $response->assertJson([
                 'event_title' => 'test',
                 'event_details' => 'test',
                 'host_organization' => 'test',
@@ -59,7 +61,9 @@ class EventControllerTest extends TestCase
                 'lat' => 43.00590,
                 'lon' => -71.01320,
                 'user_id' => $user->id,
+                
             ]);
+            
             $this->assertEquals('docs/' . $file->hashName(), EventPhoto::latest()->first()->filename);
             Storage::disk('public')->assertExists('docs/' .$file->hashName());
         }
@@ -177,7 +181,7 @@ class EventControllerTest extends TestCase
             $response->assertStatus(404);
             
             // test variants of a get
-            $response = $this->get('api/events?zipcode=33187&q=Velit%20beatae%20unde&range=10000&date=2020-10-10');
+            $response = $this->get('api/events?zipcode=33187&q=Velit%20beatae%20unde&orderby=distance&range=10000&date=2020-10-10');
             $response->assertOk();
             $response->assertJsonStructure([
                 'data'

@@ -72,7 +72,7 @@ class UserControllerTest extends TestCase
                 'location' => $user->location,
                 'phone' => $user->phone,
                 'email' => $user->email,
-                'rank' => $user->rank ]);
+                 ]);
             
         }
         

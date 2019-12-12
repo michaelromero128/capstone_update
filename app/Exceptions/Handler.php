@@ -57,7 +57,9 @@ class Handler extends ExceptionHandler
         if($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException){
             return response()->json(['message' => 'model not found'], 404);
         }
-        return response()->json(['message' => 'something bad happened', 'errors' => $exception->getMessage()], 500);
-        //return parent::render($request, $exception);
+       // if($exception instanceof \GuzzleHttp\Exception\RequestException){
+         //   return response()->json(['message'=> 'guzzle client error, check oauth client table values'],500);
+        //}
+        return parent::render($request, $exception);
     }
 }

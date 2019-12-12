@@ -7,6 +7,6 @@ use Faker\Generator as Faker;
 
 $factory->define(EventPhoto::class, function (Faker $faker) {
     return [
-        'filename' => 'docs/' . $faker->image('public/docs',400,300,null,false)
+        'filename' => 'docs/' . $faker->image('public/docs',800,600,null,false)
     ];
 });

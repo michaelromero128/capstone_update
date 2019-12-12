@@ -25,8 +25,15 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $orderBy = $request->input('orderBy','start_date');
+        
+        //asserts the sort by parameter
         $query = Event::with('eventPhotos');
+        $orderBy = $request->input('orderby','start_date');
+        if($orderBy=='distance'){
+            $query= $query->orderBy('distance','asc');
+        }else{
+            $query=$query->orderBy($orderBy);
+        }
         // builds query depending on parameters of request
         if(isset($request->zipcode)){
            $query = $query->zipcode($request->input('range',25), $request->zipcode);
@@ -43,15 +50,15 @@ class EventController extends Controller
         
         // returns a specific type of output based upon parameters
         if(isset($request->date)){
-            return $query->daterange($request->date)->with('eventPhotos')->orderBy($orderBy)->simplePaginate($request->input('pagen',8));
+            return $query->daterange($request->date)->with('eventPhotos')->orderByRaw($orderBy)->simplePaginate($request->input('pagen',8));
         }
         if(isset($request->old) && $request->old == 'yes'){
-            return $query->orderBy($orderBy)->simplePaginate($request->input('pagen',8)); 
+            return $query->orderByRaw($orderBy)->simplePaginate($request->input('pagen',8)); 
         }
         if(isset($request->old) && $request->old == 'only'){
-            return $query->where('end_date','<',date('Y-m-d'))->orderBy($orderBy)->simplePaginate($request->input('pagen',8));
+            return $query->where('end_date','<',date('Y-m-d'))->orderByRaw($orderBy)->simplePaginate($request->input('pagen',8));
         }
-        return $query->where('end_date','>=',date('Y-m-d'))->orderBy($orderBy)->simplePaginate($request->input('pagen',8));
+        return $query->where('end_date','>=',date('Y-m-d'))->orderByRaw($orderBy)->simplePaginate($request->input('pagen',8));
     }
 
     
@@ -120,7 +127,7 @@ class EventController extends Controller
             
             //creates event photos
             if($request->hasFile('file')){
-                request()->validate(['file' =>'required |image']);
+                request()->validate(['file' =>'required' , 'file.*' => 'mimes:jpeg,jpg,png,gif,svg']);
                 
                 $files = $request->file;
                 

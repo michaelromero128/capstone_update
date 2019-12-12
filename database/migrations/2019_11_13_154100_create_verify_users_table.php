@@ -15,7 +15,7 @@ class CreateVerifyUsersTable extends Migration
     {
         Schema::create('verify_users', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('user_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned()->index();
             $table->string('token');
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users');
