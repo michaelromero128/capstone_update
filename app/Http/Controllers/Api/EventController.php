@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pagination;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 
 class EventController extends Controller
@@ -50,15 +52,18 @@ class EventController extends Controller
         
         // returns a specific type of output based upon parameters
         if(isset($request->date)){
-            return $query->daterange($request->date)->with('eventPhotos')->orderByRaw($orderBy)->simplePaginate($request->input('pagen',8));
+            $results= $query->daterange($request->date)->with('eventPhotos')->orderByRaw($orderBy)->get();
+        }elseif(isset($request->old) && $request->old == 'yes'){
+            $results =$query->orderByRaw($orderBy)->get(); 
+        }elseif(isset($request->old) && $request->old == 'only'){
+            $results = $query->where('end_date','<',date('Y-m-d'))->get();
+        }else{
+            $results = $query->where('end_date','>=',date('Y-m-d'))->orderByRaw($orderBy)->get();
         }
-        if(isset($request->old) && $request->old == 'yes'){
-            return $query->orderByRaw($orderBy)->simplePaginate($request->input('pagen',8)); 
-        }
-        if(isset($request->old) && $request->old == 'only'){
-            return $query->where('end_date','<',date('Y-m-d'))->orderByRaw($orderBy)->simplePaginate($request->input('pagen',8));
-        }
-        return $query->where('end_date','>=',date('Y-m-d'))->orderByRaw($orderBy)->simplePaginate($request->input('pagen',8));
+        $pagen = $request->input('pagen',8);
+        $page = $request->input('page',1);
+        $searchslice = $results->slice(($page-1) * $pagen, $pagen)->all();
+        return new LengthAwarePaginator($searchslice,count($results),$pagen, $page, ['path' => $request->url(), 'query'=> $request->query()]);
     }
 
     
