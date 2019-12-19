@@ -51,16 +51,16 @@ class VerificationController extends Controller
     // verifies user
     public function customVerify(Request $request){
         //validates input
-        if(!isset($request->user_id)){
-            return response()->json(['message' => 'No user ID'],400);
+        if(!isset($request->email)){
+            return response()->json(['message' => 'No user email'],400);
         }
         if(!isset($request->token)){
             return response()->json(['message' => 'No user token'],400);
         }
-        $user = User::where('id',$request->user_id)->first();
+        $user = User::where('email',$request->email)->first();
         
         if($user == null){
-            return response()->json(['message' => 'Bad User Id'],400);
+            return response()->json(['message' => 'Bad User email'],400);
         }
         // gets the related user
         // checks if email is allready validated

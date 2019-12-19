@@ -27,6 +27,7 @@ class AuthControllerTest extends TestCase
         $client->makePartial()->shouldReceive('request')->once()->andReturn($out);
         $this->app->instance(Client::class, $client);
         $response = $this->post(route('auth_grant'), $params);
+        
         $response->assertOk();
         \Mockery::close();
     }
@@ -117,8 +118,8 @@ class AuthControllerTest extends TestCase
         $this->post(route('register'), $this->createTestUserParams());
         $user = User::where('email',config('authController.test_email'))->first();
         $token = $user->verifyUser->token;
-        $id = $user->verifyUser->user_id;
-        $this->post(route('email.customVerify'), ['user_id' => $id, 'token' => $token]);
+        $id = $user->email;
+        $this->post(route('email.customVerify'), ['email' => $id, 'token' => $token]);
         
         $user=$user->refresh();
         return $user;

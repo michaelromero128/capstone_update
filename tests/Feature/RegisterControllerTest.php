@@ -78,7 +78,7 @@ class RegisterControllerTest extends TestCase
             $this->post(route('register'), $this->createTestUserParams());
             $user = User::where('email',config('authController.test_email'))->first();
             $token = $user->verifyUser->token;
-            $id = $user->verifyUser->user_id;
+            $id = $user->email;
             $this->post(route('email.customVerify'), ['user_id' => $id, 'token' => $token]);
             
             $user=$user->refresh();

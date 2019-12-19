@@ -43,8 +43,8 @@ class VerificationControllerTest extends TestCase
             $user = User::where('email',config('authController.test_email'))->first();
             if($user){
                 $token = $user->verifyUser->token;
-                $id = $user->verifyUser->user_id;
-                $response2 = $this->post(route('email.customVerify'), ['user_id' => $id, 'token' => $token]);
+                $id = $user->email;
+                $response2 = $this->post(route('email.customVerify'), ['email' => $id, 'token' => $token]);
                 $response2->assertOk();
                 $user = $user->refresh();
                 $this->assertNotNull($user->email_verified_at);
@@ -59,8 +59,8 @@ class VerificationControllerTest extends TestCase
             $user = User::where('email',config('authController.test_email'))->first();
             if($user){
                 $token = 'abcd';
-                $id = $user->verifyUser->user_id;
-                $response2 = $this->post(route('email.customVerify'), ['user_id' => $id, 'token' => $token]);
+                $id = $user->email;
+                $response2 = $this->post(route('email.customVerify'), ['email' => $id, 'token' => $token]);
                 $response2->assertStatus(400);
                 $user = $user->refresh();
                 $this->assertNull($user->email_verified_at);
