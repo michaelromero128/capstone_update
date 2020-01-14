@@ -207,8 +207,9 @@ class EventController extends Controller
             'address' => 'string',
             'zipcode' => 'numeric',
         ]);
+        
         // update event
-        $event->update($request->only([
+        $params = $request->only([
             'event_title',
             'event_details',
             'host_organization',
@@ -226,7 +227,12 @@ class EventController extends Controller
             'city',
             'address',
             'zipcode',
-        ]));
+        ]);
+        foreach($params as $key=>$value){
+            $params[$key] = htmlentities($value);
+        }
+        
+        $event->update($params);
         return($event);
     }
     

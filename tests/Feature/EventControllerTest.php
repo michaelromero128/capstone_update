@@ -210,9 +210,11 @@ class EventControllerTest extends TestCase
             $id =$response->json('id');
             $params= ['event_title' => 'thing'];
             $response = $this->call('PUT', 'api/events/' . $id, $params, [],[]);
+            
             $response->assertOk();
             $response->assertJson([
                 'event_title' => 'thing',
+                
             ]);
             $response = $this->call('PUT', 'api/events/' . -33, $params, [],[]);
             $response->assertStatus(404);
