@@ -10,6 +10,6 @@
     <br/>
     Click the link below to verify your email.
     <br/>
-    <a href="{{\config('authController.front_url')}}?id={{$user->id}}">Verify Email</a>
+    <a href="{{\config('authController.front_url')}}">Verify Email</a>
   </body>
 </html>

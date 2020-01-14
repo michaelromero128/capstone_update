@@ -20,3 +20,5 @@ Auth::routes(['verify' => true]);
 Route::post('email/customVerify', 'Auth\VerificationController@customVerify')->middleware('throttle:6,1')->name('email.customVerify');
 Route::post('email/customResend', 'Auth\VerificationController@customResend')->middleware('throttle:6,1')->name('email.customResend');
 Route::post('password/change', 'Auth\ChangePasswordController@changePassword')->middleware('auth:api','throttle:6,1')->name('password.change');
+Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->middleware('throttle:6,1')->name('password.email');
+Route::post('password/reset','Auth\ResetPasswordController@reset')->middleware('throttle:6,1')->name('password.reset');
